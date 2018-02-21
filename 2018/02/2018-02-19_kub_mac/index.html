@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="使用 Docker 自带的 Kubernetes 环境玩耍"/>
+
+
+
+
+  <meta name="keywords" content="kubernetes, Wilbeibi" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Wilbeibi">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://wilbeibi.com/2018/02/2018-02-19_kub_mac/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+
+
+
+
+    <title> Kubernetes Mac 教程 - Wilbeibi </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Wilbeibi</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            Home
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            Archives
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            About
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Wilbeibi</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              Home
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              Archives
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              About
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Kubernetes Mac 教程
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-02-19
+        </span>
+        
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#预备工作与环境："><span class="toc-text">预备工作与环境：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检查一下"><span class="toc-text">检查一下</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装-Kubernetes-Dashboard"><span class="toc-text">安装 Kubernetes Dashboard</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx-示例"><span class="toc-text">Nginx 示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通过外部访问"><span class="toc-text">通过外部访问</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>Kubernetes 是当前最流行，功能最齐全的 Container Orchestration 平台，如果 Docker 是集装箱，那么 Kubernetes 就是一个调度，交通，管理等一应俱全的码头。</p>
+<p>本文希望能帮助读者不打针，不吃药，不用安装 minikube，无痛地在Mac上愉快的与 Kubernetes 玩耍。</p>
+<p>翻译改编自 Romin Irani 的 <a href="https://rominirani.com/tutorial-getting-started-with-kubernetes-with-docker-on-mac-7f58467203fd" target="_blank" rel="external">https://rominirani.com/tutorial-getting-started-with-kubernetes-with-docker-on-mac-7f58467203fd</a></p>
+<h2 id="预备工作与环境："><a href="#预备工作与环境：" class="headerlink" title="预备工作与环境："></a><strong>预备工作与环境</strong>：</h2><ol>
+<li>MacOS High Sierra</li>
+<li>安装 Docker Edge 版本（写此文时版本号是 18.02.0-ce-mac53）</li>
+<li>我使用的命令行是 oh-my-zsh, 在 ~/.zshrc 的 plugins 部分添加 kubectl 和 docker，方便 命令自动补全。 </li>
+<li>对 Kubernetes 的基本概念 pod，deployment，service namespace 有基本了解（不了解也没问题，文末有链接）</li>
+</ol>
+<p>在 Docker Edge 配置里，”Enable Kubernetes” -&gt; “Apply” -&gt; “Install”, 就会安装好所需的库，在后台跑起一个默认的 Kubernetes cluster。<br><img src="https://i.imgur.com/YYnBCBz.png" alt=""></p>
+<p>看到 “Docker is running”, “Kubernetes is running” 两个绿点，万事俱备了。</p>
+<h2 id="检查一下"><a href="#检查一下" class="headerlink" title="检查一下"></a><strong>检查一下</strong></h2><p>可以在命令行环境里检查一下安装。Server 和 Client 的版本可能会不一样，如果安装了 gcloud sdk 里的 Kubernetes，<code>current-context</code> 也会不一样（取决于你的 server 在哪儿）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl version</span><br><span class="line">Client Version: version.Info&#123;Major:&quot;1&quot;, Minor:&quot;8&quot;, GitVersion:&quot;v1.8.6&quot;, GitCommit:&quot;6260bb08c46c31eea6cb538b34a9ceb3e406689c&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2017-12-21T06:34:11Z&quot;, GoVersion:&quot;go1.8.3&quot;, Compiler:&quot;gc&quot;, Platform:&quot;darwin/amd64&quot;&#125;</span><br><span class="line">Server Version: version.Info&#123;Major:&quot;1&quot;, Minor:&quot;9&quot;, GitVersion:&quot;v1.9.2&quot;, GitCommit:&quot;5fa2db2bd46ac79e5e00a4e6ed24191080aa463b&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2018-01-18T09:42:01Z&quot;, GoVersion:&quot;go1.9.2&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;&#125;</span><br><span class="line"></span><br><span class="line">$ kubectl config current-context</span><br><span class="line">docker-for-desktop</span><br></pre></td></tr></table></figure>
+<p>再看看 cluster，里面目前只有一个node。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl cluster-info</span><br><span class="line">Kubernetes master is running at https://localhost:6443</span><br><span class="line">KubeDNS is running at https://localhost:6443/api/v1/namespaces/kube-system/services/kube-dns/proxy</span><br><span class="line"></span><br><span class="line">To further debug and diagnose cluster problems, use &apos;kubectl cluster-info dump&apos;.</span><br><span class="line"></span><br><span class="line">$ kubectl get nodes</span><br><span class="line">NAME                 STATUS    ROLES     AGE       VERSION</span><br><span class="line">docker-for-desktop   Ready     master    9d        v1.9.2</span><br></pre></td></tr></table></figure>
+<h2 id="安装-Kubernetes-Dashboard"><a href="#安装-Kubernetes-Dashboard" class="headerlink" title="安装 Kubernetes Dashboard"></a><strong>安装 Kubernetes Dashboard</strong></h2><p>下一步，给刚才的 Kubernetes cluster 安装一个 Dashboard，安装的过程也正是 Kubernetes 创建 deployment/services 的过程。Dashboard 的 kubernetes-dashboard.yaml 文件也是一个很好的学习例子，可以读一读。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yamlsecret “kubernetes-dashboard-certs” createdserviceaccount “kubernetes-dashboard” createdrole “kubernetes-dashboard-minimal” createdrolebinding “kubernetes-dashboard-minimal” createddeployment “kubernetes-dashboard” createdservice “kubernetes-dashboard” created</span><br></pre></td></tr></table></figure>
+<p>在 kubernetes-dashboard.yaml 中，我们注意到 metadata 部分的 namespace 是 kube-system，来看一下 kube-system 下有哪些 pods。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get pods --namespace=kube-system</span><br><span class="line">NAME                                         READY     STATUS    RESTARTS   AGE</span><br><span class="line">etcd-docker-for-desktop                      1/1       Running   0          9d</span><br><span class="line">kube-apiserver-docker-for-desktop            1/1       Running   0          9d</span><br><span class="line">kube-controller-manager-docker-for-desktop   1/1       Running   0          9d</span><br><span class="line">kube-dns-6f4fd4bdf-6cmxv                     3/3       Running   0          9d</span><br><span class="line">kube-proxy-fmpgn                             1/1       Running   0          9d</span><br><span class="line">kube-scheduler-docker-for-desktop            1/1       Running   0          9d</span><br><span class="line">kubernetes-dashboard-845747bdd4-9fm69        1/1       Running   1          9d</span><br></pre></td></tr></table></figure>
+<p>和 Kuberenetes architecture 图一一对应：<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Kubernetes.png/600px-Kubernetes.png" alt="Kubernetes architecture diagram on Wikipedia"><br>每个 pod 一开始状态都是 ContainerCreating，小等几秒钟，就成功变成 Running。</p>
+<p>成功运行后，我们开启 proxy server 从本地访问 Kubernetes API server：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl proxy</span><br><span class="line">Starting to serve on 127.0.0.1:8001</span><br></pre></td></tr></table></figure></p>
+<p>浏览器里访问 <a href="http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/" target="_blank" rel="external">http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
+</a>：<br><img src="https://i.imgur.com/1rFaW57.png" alt=""><br>选 SKIP，就能看到 Dashboard 了：<br><img src="https://i.imgur.com/wVKvhEA.png" alt=""></p>
+<p>在侧边栏点 Nodes，就能看到之前我们显示的 “docker-for-desktop”</p>
+<p>注: 原文中用的是 <code>kubectl port-forward</code> 8443 端口，所以截图中地址栏都是 localhost:8443。原文使用的命令是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl port-forward kubernetes-dashboard-845747bdd4-9fm69 8443:8443 — namespace=kube-systemForwarding from 127.0.0.1:8443 -&gt; 8443</span><br></pre></td></tr></table></figure>
+<p>但通过搜索，貌似 <code>kubectl proxy</code> 的方法更为简洁和主流。</p>
+<h2 id="Nginx-示例"><a href="#Nginx-示例" class="headerlink" title="Nginx 示例"></a><strong>Nginx 示例</strong></h2><p>跑一个 <a href="https://hub.docker.com/_/nginx/" target="_blank" rel="external">Nginx container</a> 来看看整个过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl run hello-nginx --image=nginx --port=80deployment “hello-nginx” created</span><br></pre></td></tr></table></figure>
+<p>这行命令创建了一个 deployment，该 deployment 会创建一个 pod，pod 负责运行 container：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get pods</span><br><span class="line">NAME                          READY     STATUS              RESTARTS   AGE</span><br><span class="line">hello-nginx-556b7bf96-2xw8f   0/1       ContainerCreating   0          12s</span><br></pre></td></tr></table></figure>
+<p>等几秒钟，再看 Dashboard 的 Deployments：</p>
+<p><img src="https://i.imgur.com/80x6zOI.png" alt=""></p>
+<p>当 Pods 由 0/1 变成 1/1 的时候， 刚才的命令结果也变成 Running 了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get pods</span><br><span class="line">NAME                          READY     STATUS    RESTARTS   AGE</span><br><span class="line">hello-nginx-556b7bf96-2xw8f   1/1       Running   0          4m</span><br></pre></td></tr></table></figure>
+<p>点侧边栏的 Pod，再点我们刚创建的 Pod “hello-nginx-556b7bf96-2xw8f”，能看到这个 pod 的细节：</p>
+<p><img src="https://i.imgur.com/MzcZmj9.png" alt=""></p>
+<p> 这里能看到给定的默认 labels，和分配的 IP （来此 docker-for-desktop Node）。</p>
+<p> 右上角的这几个按钮也是我们经常用的功能，EXEC 打开一个浏览器中的 shell ssh 进入 pod，LOGS 查看日志。</p>
+<p> <img src="https://i.imgur.com/e4vZ90F.png" alt=""></p>
+<p>同样的，我们也可以通过 <code>kubectl describe node/pod</code> 命令来查看信息，如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl describe pod hello-nginx-556b7bf96-2xw8f</span><br><span class="line">Name:           hello-nginx-556b7bf96-2xw8f</span><br><span class="line">Namespace:      default</span><br><span class="line">Node:           docker-for-desktop/192.168.65.3</span><br><span class="line">Start Time:     Tue, 20 Feb 2018 22:34:19 -0800</span><br><span class="line">Labels:         pod-template-hash=112636952</span><br><span class="line">                run=hello-nginx</span><br><span class="line">Annotations:    &lt;none&gt;</span><br><span class="line">Status:         Running</span><br><span class="line">IP:             10.1.0.54</span><br><span class="line">Controlled By:  ReplicaSet/hello-nginx-556b7bf96</span><br><span class="line">Containers:</span><br><span class="line">  hello-nginx:</span><br><span class="line">    Container ID:   docker://5c5f68348ed8a204dcce089a21d71e36cbfdb6c7955fd28a7f148d5f44662861</span><br><span class="line">    Image:          nginx</span><br><span class="line">    Image ID:       docker-pullable://nginx@sha256:65f0ed5362b39c16cad51f27217c12ac9dd0db4dc47b0197969885f05198d4d8</span><br><span class="line">    Port:           80/TCP</span><br><span class="line">    State:          Running</span><br><span class="line">      Started:      Tue, 20 Feb 2018 22:34:37 -0800</span><br><span class="line">    Ready:          True</span><br><span class="line">    Restart Count:  0</span><br><span class="line">    Environment:    &lt;none&gt;</span><br><span class="line">    Mounts:</span><br><span class="line">      /var/run/secrets/kubernetes.io/serviceaccount from default-token-m99ws (ro)</span><br><span class="line">Conditions:</span><br><span class="line">  Type           Status</span><br><span class="line">  Initialized    True</span><br><span class="line">  Ready          True</span><br><span class="line">  PodScheduled   True</span><br><span class="line">Volumes:</span><br><span class="line">  default-token-m99ws:</span><br><span class="line">    Type:        Secret (a volume populated by a Secret)</span><br><span class="line">    SecretName:  default-token-m99ws</span><br><span class="line">    Optional:    false</span><br><span class="line">QoS Class:       BestEffort</span><br><span class="line">Node-Selectors:  &lt;none&gt;</span><br><span class="line">Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s</span><br><span class="line">                 node.kubernetes.io/unreachable:NoExecute for 300s</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason                 Age   From                         Message</span><br><span class="line">  ----    ------                 ----  ----                         -------</span><br><span class="line">  Normal  Scheduled              15m   default-scheduler            Successfully assigned hello-nginx-556b7bf96-2xw8f to docker-for-desktop</span><br><span class="line">  Normal  SuccessfulMountVolume  15m   kubelet, docker-for-desktop  MountVolume.SetUp succeeded for volume &quot;default-token-m99ws&quot;</span><br><span class="line">  Normal  Pulling                15m   kubelet, docker-for-desktop  pulling image &quot;nginx&quot;</span><br><span class="line">  Normal  Pulled                 15m   kubelet, docker-for-desktop  Successfully pulled image &quot;nginx&quot;</span><br><span class="line">  Normal  Created                15m   kubelet, docker-for-desktop  Created container</span><br><span class="line">  Normal  Started                15m   kubelet, docker-for-desktop  Started container</span><br></pre></td></tr></table></figure>
+<h2 id="通过外部访问"><a href="#通过外部访问" class="headerlink" title="通过外部访问"></a><strong>通过外部访问</strong></h2><p>之前我们提到过，可以用 port-forward pod 来实现外部访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get pods</span><br><span class="line">NAME                          READY     STATUS    RESTARTS   AGE</span><br><span class="line">hello-nginx-556b7bf96-2xw8f   1/1       Running   0          46m</span><br><span class="line"></span><br><span class="line">$ kubectl port-forward hello-nginx-556b7bf96-2xw8f 8080:8080</span><br><span class="line">Forwarding from 127.0.0.1:8080 -&gt; 8080</span><br></pre></td></tr></table></figure>
+<p>但这只暴露特定 pod 的端口，在实际中并不实用。</p>
+<p>所以我们换一个方法，把 deployment 暴露成一个服务，供外部访问:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get deployment</span><br><span class="line">NAME          DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">hello-nginx   1         1         1            1           18m</span><br><span class="line"></span><br><span class="line">$ kubectl expose deployment hello-nginx --type=NodePort --name=hello-nginx-service</span><br><span class="line">service &quot;hello-nginx-service&quot; exposed</span><br><span class="line"></span><br><span class="line">$ kubectl get service</span><br><span class="line">NAME                  TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                                         AGE</span><br><span class="line">hello-nginx-service   NodePort    10.109.0.203   &lt;none&gt;        80:30351/TCP                                    30s</span><br><span class="line">kubernetes            ClusterIP   10.96.0.1      &lt;none&gt;        443/TCP                                         10d</span><br></pre></td></tr></table></figure>
+<p>现在，浏览器里就能访问 localhost:30351 了。</p>
+<p>注意到真正的 EXTERNAL-IP 都是 none，这是因为 Mac 安装的 Docker cluster 并没有 LoadBalancer, 只有云服务上才有。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/kubernetes/">kubernetes</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2016/07/2016-07-31-weekly3/">
+        <span class="next-text nav-default">一周笔记</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/Wilbeibi" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://www.instagram.com/wilbeibi" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">wilbeibi</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  <script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://wilbeibi.com/2018/02/2018-02-19_kub_mac/';
+        this.page.identifier = '2018/02/2018-02-19_kub_mac/';
+        this.page.title = 'Kubernetes Mac 教程';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+
+    s.src = '//wilmatrix.disqus.com/embed.js';
+
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();  
+  </script>
+
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>
