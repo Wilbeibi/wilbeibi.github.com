@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="使用 sourcegraph container 来检索自己的代码库"/>
+
+
+
+
+  <meta name="keywords" content="sourcegraph, container, Wilbeibi" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Wilbeibi">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://wilbeibi.com/2018/03/2018-03-01_codeserch/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+
+
+  <script id="google_analytics">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-37214024-1', 'auto');
+        ga('send', 'pageview');
+  </script>
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+
+
+
+
+    <title> 搭建私有代码搜索引擎 - Wilbeibi </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Wilbeibi</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+      <a href="/about">
+        <li class="mobile-menu-item">
+          
+          
+            关于
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Wilbeibi</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/about">
+            
+            
+              关于
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          搭建私有代码搜索引擎
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-01
+        </span>
+        
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何学习好的的代码"><span class="toc-text">如何学习好的的代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mac-上跑起来"><span class="toc-text">Mac 上跑起来</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#批量添加代码库"><span class="toc-text">批量添加代码库</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <h2 id="如何学习好的的代码"><a href="#如何学习好的的代码" class="headerlink" title="如何学习好的的代码"></a>如何学习好的的代码</h2><p>我有一个需求，当学习一门新语言的时候，经常想看看一些库或者函数的 best practice。官方文章只告诉你如何调用，没有说什么时候调用，前后的 context 是什么，怎么组织代码。而在 github 搜索这个函数的代码片段的时候，出来的结果经常十几页，其中大量重复的结果，并且大部分代码质量并不怎么样，所以我的需求是：</p>
+<ol>
+<li>搜索范围只限定在我觉得的质量不错的项目中。</li>
+<li>能显示上下文， 最好还能 index，查看定义和跳转。</li>
+</ol>
+<p>sourcegraph 的自搭 container 就不错，支持 Golang, Java, Python, Javascript, Ruby （比 OpenGrok 好太多，也方便太多）。就是上面所说的需求2要付费（damn）。</p>
+<h2 id="Mac-上跑起来"><a href="#Mac-上跑起来" class="headerlink" title="Mac 上跑起来"></a>Mac 上跑起来</h2><p><a href="https://about.sourcegraph.com/" target="_blank" rel="external">soucegraph</a> 上演示用的命令是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line"> --publish 7080:7080 --rm \</span><br><span class="line"> --volume $HOME/.sourcegraph/config:/etc/sourcegraph \</span><br><span class="line"> --volume $HOME/.sourcegraph/data:/var/opt/sourcegraph \</span><br><span class="line"> sourcegraph/server:2.5.17</span><br></pre></td></tr></table></figure>
+<p>然后这是无法在 Mac 上直接跑的，貌似 volume 在$HOME 下都没法使用（见 <a href="https://github.com/sourcegraph/issues/issues/41" target="_blank" rel="external">issue</a>）。<br>所以稍稍改一下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">--publish 7080:7080 --rm \</span><br><span class="line">--volume /data/sourcegraph/config:/etc/sourcegraph \</span><br><span class="line">--volume /data/sourcegraph/data:/var/opt/sourcegraph \</span><br><span class="line">sourcegraph/server:2.5.17</span><br></pre></td></tr></table></figure></p>
+<p>然后登陆 http://<docker-machine ip="">:7080, 进入 Admin -&gt; Configuration, 开始配置<br><img src="https://i.imgur.com/qRBhqLl.png" alt=""></docker-machine></p>
+<p>注意，默认的 <code>maxReposToSearch</code> 太小，我把这改成200。</p>
+<p>其次，这里有很多方式添加搜索的项目，可以输入 Github token 来检索你自己的仓库（自己的破代码有什么好搜索的），也可以添加如图第三方代码。我们这里选 “Add other reposity”，”repos.list” 会添加一个空白的 url, path 让你填写，然后会提示重启server， server 会自己 clone 代码，indexing。</p>
+<h2 id="批量添加代码库"><a href="#批量添加代码库" class="headerlink" title="批量添加代码库"></a>批量添加代码库</h2><p>这里我挑选的列表是 <a href="https://github.com/rsc/corpus" target="_blank" rel="external">rsc/corpus</a> —— Russ Cox 收集的 Golang 项目列表，能入 Russ 大佬法眼的代码，质量是有保证的。</p>
+<p>仔细观察，Russ 是建了一个 bot，添加选好的 github 项目到 corpus 里。所以 commit message 很规范：<br><img src="https://i.imgur.com/wN4yzRj.png" alt=""></p>
+<p>我们只要提取 commit message 中的项目地址，转换成 sourcegraph 配置需要的 url 和 path，就行啦~</p>
+<p>这里用 <a href="https://developer.github.com/v3/repos/commits/" target="_blank" rel="external">Github API</a> 得到 commit 信息，<a href="https://stedolan.github.io/jq/" target="_blank" rel="external">jq</a>（方便好用的命令行 json 工具） 来过滤出 message。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://api.github.com/repos/rsc/corpus/commits\?per_page\=130 |jq &apos;.[] | &#123;message: .commit.message&#125;&apos; | grep addproject |  grep -o &apos;github.com/\w\+/\w\+&apos; &gt; repos.txt</span><br></pre></td></tr></table></figure>
+<p>biu， 就得到项目列表了（截止写文章时候，86个）：</p>
+<p><img src="https://i.imgur.com/Fig6EtK.png" alt=""></p>
+<p>然后就是列表转配置，简单的几行 Golang 代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	patt := `</span><br><span class="line">    &#123;</span><br><span class="line">	&quot;url&quot;: &quot;https://github.com/%s.git&quot;,</span><br><span class="line">	&quot;path&quot;: &quot;%s&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    `</span><br><span class="line">	scanner := bufio.NewScanner(os.Stdin)</span><br><span class="line">	for scanner.Scan() &#123;</span><br><span class="line">		path := strings.TrimPrefix(scanner.Text(), &quot;github.com/&quot;)</span><br><span class="line">		fmt.Printf(patt, path, path)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	if scanner.Err() != nil &#123;</span><br><span class="line">		// handle error.</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译成 converter， <code>cat repos.txt | ./converter | pbcopy</code>, 复制到 sourcegraph 配置里（别忘了删掉配置json最后多出来的逗号)。</p>
+<p>完成！项目需要 clone 一会，就会显示在 explore 里了：</p>
+<p><img src="https://i.imgur.com/EfL2tai.png" alt=""></p>
+<p>也可以用来搜索想要的代码片段了。</p>
+<p><img src="https://i.imgur.com/1bF0wbr.png" alt=""></p>
+<p>小练习：用 <a href="https://developer.github.com/v3/activity/starring/#list-repositories-being-starred" target="_blank" rel="external">Github API</a> 添加自己标记过星的项目。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/sourcegraph/">sourcegraph</a>
+            
+              <a href="/tags/container/">container</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2018/02/2018-02-19_kub_mac/">
+        <span class="next-text nav-default">Kubernetes Mac 教程</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/Wilbeibi" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://www.instagram.com/wilbeibi" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2015 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">wilbeibi</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  <script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://wilbeibi.com/2018/03/2018-03-01_codeserch/';
+        this.page.identifier = '2018/03/2018-03-01_codeserch/';
+        this.page.title = '搭建私有代码搜索引擎';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+
+    s.src = '//wilmatrix.disqus.com/embed.js';
+
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();  
+  </script>
+
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>
