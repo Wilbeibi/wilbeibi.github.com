@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wilbeibi.com/"/>
-  <updated>2018-03-02T18:42:59.744Z</updated>
+  <updated>2018-03-02T23:47:02.726Z</updated>
   <id>http://wilbeibi.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>把闲置服务器配置成 Docker Machine</title>
+    <link href="http://wilbeibi.com/2018/03/2018-03-02/"/>
+    <id>http://wilbeibi.com/2018/03/2018-03-02/</id>
+    <published>2018-03-02T08:00:00.000Z</published>
+    <updated>2018-03-02T23:47:02.726Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="准备工作和环境"><a href="#准备工作和环境" class="headerlink" title="准备工作和环境"></a>准备工作和环境</h2><p>我有一个闲置的 DigitalOcean VPS，只用来跑一个 RSS 服务，网易云音乐海外代理，大部分时间计算资源被浪费。这里把这个 Debian VPS 配置成 docker machine 来跑容器玩。</p><h3 id="Mac-上的准备"><a href="#Mac-上的准备" class="headerlink" title="Mac 上的准备"></a>Mac 上的准备</h3><ol><li>确定 docker client 版本和 VPS 上的 docker server 版本兼容（API版本兼容就行了）。</li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">(Mac)$ docker version</span><br><span class="line">Client:</span><br><span class="line"> Version:18.03.0-ce-rc1</span><br><span class="line"> API version:1.35 (downgraded from 1.37)</span><br><span class="line"> Go version:go1.9.4</span><br><span class="line"> Git commit:c160c73</span><br><span class="line"> Built:Thu Feb 22 02:34:03 2018</span><br><span class="line"> OS/Arch:darwin/amd64</span><br><span class="line"> Experimental:true</span><br><span class="line"> Orchestrator:swarm</span><br><span class="line"> # Server info...</span><br><span class="line"> </span><br><span class="line"> (DebianVPS)$ docker version</span><br><span class="line"> # Client info...</span><br><span class="line"> Server:</span><br><span class="line"> Engine:</span><br><span class="line">  Version:17.12.0-ce</span><br><span class="line">  API version:1.35 (minimum version 1.12)</span><br><span class="line">  Go version:go1.9.2</span><br><span class="line">  Git commit:c97c6d6</span><br><span class="line">  Built:Wed Dec 27 20:09:54 2017</span><br><span class="line">  OS/Arch:linux/amd64</span><br><span class="line">  Experimental:false</span><br></pre></td></tr></table></figure><ol><li>Mac 能通过 public key 认证访问 Debian VPS。</li><li>如果要在 VPS 使用 <code>sudo</code>，确保 VPS 上的 sudo 不需要密码：</li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># visudo</span><br><span class="line">%sudo   ALL=(ALL) NOPASSWD:ALL</span><br></pre></td></tr></table></figure><ol><li>VPS 防火墙允许 2376 端口访问（DigitalOcean 没有 inbound/outbound 限制，默认都开着的）。</li></ol><h2 id="创建-Docker-Machine"><a href="#创建-Docker-Machine" class="headerlink" title="创建 Docker Machine"></a>创建 Docker Machine</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine -D create \</span><br><span class="line">  --driver generic \</span><br><span class="line">  --generic-ip-address=&lt;VPS IP&gt; \</span><br><span class="line">  --generic-ssh-user &lt;VPS username after ssh&gt; \</span><br><span class="line">  asgard</span><br></pre></td></tr></table></figure><p><code>-D</code> 是 debug 模式。driver 可选 Google Compute，Amazon，Azure，DigitalOcean 官方的 Docker 服务，我们这里是 generic，任何 VPS 通用的。</p><p>这里默认的 key 是 <code>~/.ssh/id_rsa</code>, 如果不是要 <code>--generic-ssh-key &lt;path to private key&gt;</code>。</p><p>如果想配置</p><p>如果顺利的话，就可以看见:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine ls</span><br><span class="line">NAME      ACTIVE   DRIVER       STATE     URL                          SWARM   DOCKER        ERRORS</span><br><span class="line">asgard    -        generic      Running   tcp://&lt;VPS IP&gt;:2376           v17.12.0-ce</span><br><span class="line">default   *        virtualbox   Running   tcp://192.168.99.100:2376            v17.12.1-ce</span><br></pre></td></tr></table></figure><p>当前使用的是 Mac 上 VirtulBox 的 docker-machine <code>default</code>, 可以用 <code>eval $(docker-machine env asgard)</code> 切换到 VPS。</p><p>最后，如果要注册 DigitalOcean, 可以用我的 <a href="https://m.do.co/c/95be94b842f9" target="_blank" rel="external">referrer link</a>。</p><h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul><li><a href="https://blog.dahanne.net/2015/10/07/adding-an-existing-docker-host-to-docker-machine-a-few-tips/" target="_blank" rel="external">ADDING AN EXISTING DOCKER HOST TO DOCKER MACHINE : A FEW TIPS</a></li><li><a href="https://docs.docker.com/machine/reference/create/" target="_blank" rel="external">docker-machine create</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      把已有的 VPS 当成 docker-machine 用
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="http://wilbeibi.com/tags/docker/"/>
+    
+  </entry>
   
   <entry>
     <title>搭建私有代码搜索引擎</title>
@@ -395,28 +415,6 @@
     
     
       <category term="notes" scheme="http://wilbeibi.com/tags/notes/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Mac程序员和他的朋友们</title>
-    <link href="http://wilbeibi.com/2014/03/2014-03-05-macandfriend/"/>
-    <id>http://wilbeibi.com/2014/03/2014-03-05-macandfriend/</id>
-    <published>2014-03-05T08:00:00.000Z</published>
-    <updated>2016-12-08T22:00:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="为什么要用Mac"><a href="#为什么要用Mac" class="headerlink" title="为什么要用Mac"></a>为什么要用Mac</h2><p>Linux内核作者<a href="http://www.zdnet.com/torvalds-switches-to-apple-1139183867/" target="_blank" rel="external">Linus早就开始使用Mac了</a>（虽然面对记者表现的很扭捏）。Gnome的作者更是理直气壮<a href="http://tirania.org/blog/archive/2013/Mar-05.html" target="_blank" rel="external">叛逃Linux投奔Mac</a>。如你所知，Mac OSX是<a href="http://programmers.stackexchange.com/questions/51670/why-do-programmers-use-or-recommend-mac-os-x" target="_blank" rel="external">开发者们的最爱</a>。因为它一方面有非常棒的用户体验，一方面是基于Unix，尽得shell的益处，又避免了Linux下种种繁琐。什么，太贵了，看看<a href="http://www.cnblogs.com/chijianqiang/p/mmac.html" target="_blank" rel="external">MacTalk是怎么说的</a>。</p><p>工欲善其事，必先利其器。这里分享下我的Mac应用和配置。</p><a id="more"></a><p>基于原则:</p><ul><li>尊重软件版权，能购买正版的，请尽量购买正版</li><li>Don’t Shave Yaks, 不要因为花太多时间配置工具而浪费工作的时间</li><li>奥卡姆剃刀，如果一项功能需求只是偶尔用一下，就别配置了。</li></ul><h2 id="应用-amp-效率"><a href="#应用-amp-效率" class="headerlink" title="应用&amp;效率"></a>应用&amp;效率</h2><h3 id="Dropbox"><a href="#Dropbox" class="headerlink" title="Dropbox"></a>Dropbox</h3><p>大名鼎鼎的Dropbox，无需赘述。是居家旅行，出门必备同步神器。Dropbox较之Google Drive更轻量级，更快，适合在多平台同步正在编辑的文档或者代码。记得Google Drive是没有Linux版客户端的，而Dropbox有！而且，Dropbox的文件分享链接是直接指向文件的，对于在remote terminal上工作且尚不熟悉scp和rsync的同学来说是福音（<code>rsync --daemon</code>效果可以媲美Dropbox）。相比之下，Google Drive 更适合来存放资料，因为它能搜索文档内关键词。</p><h3 id="Mou"><a href="#Mou" class="headerlink" title="Mou"></a>Mou</h3><p>我见过最好的MarkDown编辑器，简洁，漂亮，可配置，支持MathJax公式编辑。<br><img src="http://mouapp.com/images/Mou_Screenshot_1.png" alt=""></p><h3 id="Evernote"><a href="#Evernote" class="headerlink" title="Evernote"></a>Evernote</h3><p>笔记软件，我主要用它在收藏平时看到的好的RSS文章，Prime版的多人协作，幻灯片功能也很赞。</p><h3 id="Pocket"><a href="#Pocket" class="headerlink" title="Pocket"></a>Pocket</h3><p>众多的ReadItLater软件中的一个，推荐Pocket是因为它的文本抽取出来的格式比较好，在移动端上的App做的也很出色。</p><h3 id="Kaleidoscope"><a href="#Kaleidoscope" class="headerlink" title="Kaleidoscope"></a>Kaleidoscope</h3><p>比较多文档之间的差异。一个命令行党应该忠诚的效忠用<code>diff</code>来比较文件，但是Kaleidoscope真的太好用了，关键是它不仅能逐行比较，还能一块块匹配着比较，还能两个文件夹比较，还能Merge文件。</p><h3 id="Alfred-2"><a href="#Alfred-2" class="headerlink" title="Alfred 2"></a>Alfred 2</h3><p>这是一个神奇的快速启动软件，就为了它，你就值得买个Mac。MacTalk里谦虚的称它为“神兵利器”。你可以用它来：</p><ul><li>打开任何应用</li><li>查找文件</li><li>执行shell命令</li><li>当计算器用</li><li>直接写email</li><li>在Google/Amazon/Wikipedia上搜索条目</li><li>… …<br>嗯，以上只是它的普通功能，只有这些还不足以称之为伟大。Alfred之牛掰，在于其可编程的第三方workflow插件机制，这样可以在Alfred里搜豆瓣图书，搜Github仓库，查看天气或PM2.5，搜索自己的Evernote笔记，查API文档，一切能想到的，<a href="http://www.zhihu.com/question/20656680" target="_blank" rel="external">都可以实现</a>。<br><img src="http://i.imgur.com/XDWlNGv.png" alt=""><br><img src="http://i.imgur.com/3hpPO97.png" alt=""></li></ul><h3 id="TextExpander"><a href="#TextExpander" class="headerlink" title="TextExpander"></a>TextExpander</h3><p>文本自动补全的插件，自定义好触发的关键词，每次输入这些关键词的时候，biu~，想打的字就全弹出来了。把自己的电话，邮箱，或者写邮件的模板存进去，能避免很多重复的劳动。</p><h3 id="Popclip"><a href="#Popclip" class="headerlink" title="Popclip"></a>Popclip</h3><p>文字选中弹出扩展。每次选中文字后，可以快速的把选中文字进行复制，粘贴，查找，加入笔记本等等。</p><h3 id="RescueTime-Time-sink"><a href="#RescueTime-Time-sink" class="headerlink" title="RescueTime (Time sink)"></a>RescueTime (Time sink)</h3><p>默默的运行在后台，告诉你你的时间都浪费在哪儿了。每周发邮件告诉你你在哪个软件，哪个网站上花了多少时间，这一天/周的效率有多高。你可以定义什么是有效率的行为（比如用Evernote写笔记，用Emacs写代码）加分，哪些是偷懒的行为（看美剧，刷豆瓣）扣分。</p><h3 id="LimeChat"><a href="#LimeChat" class="headerlink" title="LimeChat"></a>LimeChat</h3><p>IRC应用，选它是因为其他的IRC应用都太！！难！！用！！了！！</p><h3 id="AppCleaner"><a href="#AppCleaner" class="headerlink" title="AppCleaner"></a>AppCleaner</h3><p>删软件清理残余。</p><h3 id="Moom"><a href="#Moom" class="headerlink" title="Moom"></a>Moom</h3><p>还在像傻帽一样花半天找到窗口边框笨手笨脚地缩放大小么？用Moom吧，能快速排好窗口，自定义想要的窗口大小。</p><h3 id="The-unarchiver"><a href="#The-unarchiver" class="headerlink" title="The unarchiver"></a>The unarchiver</h3><p>普通解压用<code>tar</code>命令，但如何有非UTF-8的中文编码，还是用unarchiver比较方便（命令行下得用<code>find</code> + <code>iconv</code>写一长串，太虐心）</p><h2 id="编程-amp-配置"><a href="#编程-amp-配置" class="headerlink" title="编程&amp;配置"></a>编程&amp;配置</h2><h3 id="Dash"><a href="#Dash" class="headerlink" title="Dash"></a>Dash</h3><p>查文档利器。作者在新版本对它收费$20，丧心病狂，但从长远考虑，还是值得的。能配合Alfred用，省心。</p><h3 id="Textmate"><a href="#Textmate" class="headerlink" title="Textmate"></a>Textmate</h3><p>bundle功能很好用，方便快速掌握一门语言。写前端代码很方便。其他时候，还是用Vim/Emacs吧。</p><h3 id="TotalCommander"><a href="#TotalCommander" class="headerlink" title="TotalCommander"></a>TotalCommander</h3><p>命令行党都有过每天得把Terminal拖来拖去的苦恼。TotalCommander正是这样一款下拉式的终端，类似Gnome下的Guake，也支持多窗口，强烈推荐。</p><h3 id="iTerm2"><a href="#iTerm2" class="headerlink" title="iTerm2"></a>iTerm2</h3><p>不管你用bash，zsh还是tcsh，有一个好用的Terminal软件是十分必要的，iTerm2就正是一个优秀的终端。好看，配置性极强，有很多方便的功能，戳<a href="http://www.yangzhiping.com/tech/iterm2.html" target="_blank" rel="external">这篇文章</a>。</p><h3 id="Homebrew"><a href="#Homebrew" class="headerlink" title="Homebrew"></a>Homebrew</h3><p>Mac下的包管理器，和ports平分天下。想装什么东西，尽管<code>brew install</code> 就好。</p><h3 id="Z-shell-tmux及配置文件"><a href="#Z-shell-tmux及配置文件" class="headerlink" title="Z shell (tmux及配置文件)"></a>Z shell (tmux及配置文件)</h3><p>基于bash的shell，被誉为The Last Shell。配置当然很复杂，不过不要紧，拿来主义一下，用<a href="https://github.com/robbyrussell/oh-my-zsh" target="_blank" rel="external">oh-my-zsh</a>一行代码安装。</p><h3 id="z-autojump"><a href="#z-autojump" class="headerlink" title="z/autojump"></a>z/autojump</h3><p>每天还在为输各种<code>cd</code>而浪费时间？<a href="https://github.com/rupa/z" target="_blank" rel="external">z</a> 是个极为方便的小配置，它把用户访问过的目录存在记录里，每次输入<code>z &lt;访问过的目录的关键词&gt;</code>，就biu的一声到了。autojump也是类似的工具。</p><p><img src="http://i.imgur.com/XFdMrp9.jpg" alt=""></p><hr><p>PS: 这篇文章只是兴之所至，所以很多东西还没来得及说，我会长期更新<br>Wed Mar  5 01:21:05 EST 2014</p>]]></content>
-    
-    <summary type="html">
-    
-      Mac编程环境的配置和常用软件
-    
-    </summary>
-    
-      <category term="Collection" scheme="http://wilbeibi.com/categories/Collection/"/>
-    
-    
-      <category term="miscellaneous" scheme="http://wilbeibi.com/tags/miscellaneous/"/>
     
   </entry>
   
