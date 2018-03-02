@@ -110,7 +110,7 @@
         <li class="mobile-menu-item">
           
           
-            Home
+            首页
           
         </li>
       </a>
@@ -119,7 +119,7 @@
         <li class="mobile-menu-item">
           
           
-            Archives
+            归档
           
         </li>
       </a>
@@ -128,7 +128,7 @@
         <li class="mobile-menu-item">
           
           
-            About
+            关于
           
         </li>
       </a>
@@ -149,7 +149,7 @@
           <a class="menu-item-link" href="/">
             
             
-              Home
+              首页
             
           </a>
         </li>
@@ -158,7 +158,7 @@
           <a class="menu-item-link" href="/archives/">
             
             
-              Archives
+              归档
             
           </a>
         </li>
@@ -167,7 +167,7 @@
           <a class="menu-item-link" href="/about">
             
             
-              About
+              关于
             
           </a>
         </li>
@@ -203,7 +203,7 @@
     
     
   <div class="post-toc" id="post-toc">
-    <h2 class="post-toc-title">Contents</h2>
+    <h2 class="post-toc-title">文章目录</h2>
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何学习好的的代码"><span class="toc-text">如何学习好的的代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mac-上跑起来"><span class="toc-text">Mac 上跑起来</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#批量添加代码库"><span class="toc-text">批量添加代码库</span></a></li></ol>
     </div>
@@ -239,8 +239,8 @@
 <p>也可以用来搜索想要的代码片段了。</p>
 <p><img src="https://i.imgur.com/1bF0wbr.png" alt=""></p>
 <p>小练习：用 <a href="https://developer.github.com/v3/activity/starring/#list-repositories-being-starred" target="_blank" rel="external">Github API</a> 添加自己标记过星的项目。</p>
-<p>PS: 这样哐哐猛造会 git clone 一大堆代码，很快 docker-machine 的空间就造光了，记得调大一点。</p>
-<p><img src="https://i.imgur.com/uqeTGep.png" alt=""><br><img src="https://i.imgur.com/KGdIyCo.png" alt=""></p>
+<p>PS: 这样哐哐猛造会 git clone 一大堆代码，很快 docker-machine 的空间就造光了，记得调大一点。/data 属于 tmpfs 区，是被加载到内存里的（<a href="https://stackoverflow.com/questions/31909979/docker-machine-no-space-left-on-device/32518699#32518699" target="_blank" rel="external">见这里</a>），所以要修改 <code>--virtualbox-memory</code>，默认1024M。 <code>--virtualbox-disk-size</code> 是用来存放 local image 的，也可以调大一点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">docker@default:~$ df -h # after docker-machine ssh</span><br><span class="line">Filesystem                Size      Used Available Use% Mounted on</span><br><span class="line">tmpfs                     2.6G    206.6M      2.4G   8% /</span><br><span class="line">tmpfs                     1.5G         0      1.5G   0% /dev/shm</span><br><span class="line">/dev/sda1                17.9G     44.7M     16.9G   0% /mnt/sda1</span><br><span class="line">cgroup                    1.5G         0      1.5G   0% /sys/fs/cgroup</span><br><span class="line">Users                   465.1G    327.2G    137.9G  70% /Users</span><br><span class="line">/dev/sda1                17.9G     44.7M     16.9G   0% /mnt/sda1/var/lib/docker</span><br><span class="line">/dev/sda1                17.9G     44.7M     16.9G   0% /mnt/sda1/var/lib/docker/plugins</span><br><span class="line"></span><br><span class="line">$ docker-machine rm default</span><br><span class="line">$ docker-machine create -d virtualbox --virtualbox-disk-size &quot;20000&quot; --virtualbox-memory &quot;3072&quot; default</span><br><span class="line"># remember to eval new docker env</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -273,7 +273,7 @@
     
       <a class="next" href="/2018/02/2018-02-19_kub_mac/">
         <span class="next-text nav-default">Kubernetes Mac 教程</span>
-        <span class="prev-text nav-mobile">Next</span>
+        <span class="prev-text nav-mobile">下一篇</span>
         <i class="iconfont icon-right"></i>
       </a>
     
@@ -349,11 +349,11 @@
 
 <div class="copyright">
   <span class="power-by">
-    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    Theme - 
+    主题 - 
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
