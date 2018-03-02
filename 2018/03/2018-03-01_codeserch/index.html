@@ -110,7 +110,7 @@
         <li class="mobile-menu-item">
           
           
-            首页
+            Home
           
         </li>
       </a>
@@ -119,7 +119,7 @@
         <li class="mobile-menu-item">
           
           
-            归档
+            Archives
           
         </li>
       </a>
@@ -128,7 +128,7 @@
         <li class="mobile-menu-item">
           
           
-            关于
+            About
           
         </li>
       </a>
@@ -149,7 +149,7 @@
           <a class="menu-item-link" href="/">
             
             
-              首页
+              Home
             
           </a>
         </li>
@@ -158,7 +158,7 @@
           <a class="menu-item-link" href="/archives/">
             
             
-              归档
+              Archives
             
           </a>
         </li>
@@ -167,7 +167,7 @@
           <a class="menu-item-link" href="/about">
             
             
-              关于
+              About
             
           </a>
         </li>
@@ -203,7 +203,7 @@
     
     
   <div class="post-toc" id="post-toc">
-    <h2 class="post-toc-title">文章目录</h2>
+    <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
       <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何学习好的的代码"><span class="toc-text">如何学习好的的代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mac-上跑起来"><span class="toc-text">Mac 上跑起来</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#批量添加代码库"><span class="toc-text">批量添加代码库</span></a></li></ol>
     </div>
@@ -218,7 +218,7 @@
 <li>能显示上下文， 最好还能 index，查看定义和跳转。</li>
 </ol>
 <p>sourcegraph 的自搭 container 就不错，支持 Golang, Java, Python, Javascript, Ruby （比 OpenGrok 好太多，也方便太多）。就是上面所说的需求2要付费（damn）。</p>
-<h2 id="Mac-上跑起来"><a href="#Mac-上跑起来" class="headerlink" title="Mac 上跑起来"></a>Mac 上跑起来</h2><p><a href="https://about.sourcegraph.com/" target="_blank" rel="external">soucegraph</a> 上演示用的命令是:</p>
+<h2 id="Mac-上跑起来"><a href="#Mac-上跑起来" class="headerlink" title="Mac 上跑起来"></a>Mac 上跑起来</h2><p><a href="https://about.sourcegraph.com/" target="_blank" rel="external">sourcegraph</a> 上演示用的命令是:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line"> --publish 7080:7080 --rm \</span><br><span class="line"> --volume $HOME/.sourcegraph/config:/etc/sourcegraph \</span><br><span class="line"> --volume $HOME/.sourcegraph/data:/var/opt/sourcegraph \</span><br><span class="line"> sourcegraph/server:2.5.17</span><br></pre></td></tr></table></figure>
 <p>然后这是无法在 Mac 上直接跑的，貌似 volume 在$HOME 下都没法使用（见 <a href="https://github.com/sourcegraph/issues/issues/41" target="_blank" rel="external">issue</a>）。<br>所以稍稍改一下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">--publish 7080:7080 --rm \</span><br><span class="line">--volume /data/sourcegraph/config:/etc/sourcegraph \</span><br><span class="line">--volume /data/sourcegraph/data:/var/opt/sourcegraph \</span><br><span class="line">sourcegraph/server:2.5.17</span><br></pre></td></tr></table></figure></p>
 <p>然后登陆 http://<docker-machine ip="">:7080, 进入 Admin -&gt; Configuration, 开始配置<br><img src="https://i.imgur.com/qRBhqLl.png" alt=""></docker-machine></p>
@@ -273,7 +273,7 @@
     
       <a class="next" href="/2018/02/2018-02-19_kub_mac/">
         <span class="next-text nav-default">Kubernetes Mac 教程</span>
-        <span class="prev-text nav-mobile">下一篇</span>
+        <span class="prev-text nav-mobile">Next</span>
         <i class="iconfont icon-right"></i>
       </a>
     
@@ -349,11 +349,11 @@
 
 <div class="copyright">
   <span class="power-by">
-    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    Theme - 
     <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
   </span>
 
